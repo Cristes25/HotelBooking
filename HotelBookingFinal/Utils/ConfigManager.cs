@@ -5,7 +5,7 @@ namespace HotelBookingFinal.Utils
 {
     public static class ConfigManager
     {
-        private static readonly string configPath = "Config.json";
+        private static readonly string configPath = "C:\\Users\\crist\\source\\repos\\Cristes25\\HotelBooking\\HotelBookingFinal\\Config.json";
 
         public static string GetConnectionString()
         {

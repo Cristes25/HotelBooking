@@ -4,9 +4,8 @@ using HotelBookingFinal.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using HotelBookingFinal ;
 using Microsoft.IdentityModel.Tokens;
-using HotelBookingFinal.Utils;
+
 namespace HotelBookingFinal.Repositories
 {
     public class AdminRepository
@@ -23,14 +22,25 @@ namespace HotelBookingFinal.Repositories
             using (var conn = new MySqlConnection(_connectionString))
             {
                 conn.Open();
-                string query = "INSERT INTO Administrators (HotelId, FirstName, LastName, Username, Password, Email) VALUES (@HotelId, @FirstName, @LastName, @Username, @Password, @Email)";
+                string checkQuery = "SELECT COUNT(*) FROM hotels WHERE HotelID = @HotelID";
+                using (var checkCmd = new MySqlCommand(checkQuery, conn))
+                {
+                    checkCmd.Parameters.AddWithValue("@HotelID", admin.HotelId);
+                    var count = Convert.ToInt32(checkCmd.ExecuteScalar());
+                    if (count == 0)
+                    {
+                        throw new Exception("Invalid HotelId.");
+                    }
+                }
+
+                string query = "INSERT INTO Administrators (HotelID, FirstName, LastName, Username, PasswordHash, Email) VALUES (@HotelID, @FirstName, @LastName, @Username, @PasswordHash, @Email)";
                 using (var cmd = new MySqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@HotelId", admin.HotelId);
+                    cmd.Parameters.AddWithValue("@HotelID", admin.HotelId);
                     cmd.Parameters.AddWithValue("@FirstName", admin.FirstName);
                     cmd.Parameters.AddWithValue("@LastName", admin.LastName);
                     cmd.Parameters.AddWithValue("@Username", admin.Username);
-                    cmd.Parameters.AddWithValue("@Password", PasswordHasher.HashPassword(password));
+                    cmd.Parameters.AddWithValue("@PasswordHash", PasswordHasher.HashPassword(password));
                     cmd.Parameters.AddWithValue("@Email", admin.Email);
                     return cmd.ExecuteNonQuery() > 0;
                 }
@@ -53,7 +63,7 @@ namespace HotelBookingFinal.Repositories
                             return new Admin
                             {
                                 AdminId = Convert.ToInt32(reader["AdminId"]),
-                                HotelId = Convert.ToInt32(reader["HotelId"]),
+                                HotelId = Convert.ToInt32(reader["HotelID"]),
                                 FirstName = reader["FirstName"].ToString(),
                                 LastName = reader["LastName"].ToString(),
                                 Username = reader["Username"].ToString(),
@@ -115,10 +125,25 @@ namespace HotelBookingFinal.Repositories
 
                     return cmd.ExecuteNonQuery() > 0;
                 }
-
-
             }
         }
+        public bool UpdatePassword(int adminId, string newPassword)
+        {
+            using (var conn = new MySqlConnection(_connectionString))
+            {
+                conn.Open();
+                string query = "UPDATE Administrators SET Password = @Password WHERE AdminId = @AdminId";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Password", PasswordHasher.HashPassword(newPassword));
+                    cmd.Parameters.AddWithValue("@AdminId", adminId);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+
+
+        }
+
         //D
         public bool DeleteAdmin(int AdminId)
         {
@@ -148,7 +173,7 @@ namespace HotelBookingFinal.Repositories
                     {
                         if (reader.Read())
                         {
-                            string hashedPassword = reader["Password"].ToString();
+                            string hashedPassword = reader["PasswordHash"].ToString();
 
                             if (PasswordHasher.VerifyPassword(password, hashedPassword))
                             {
@@ -188,6 +213,29 @@ namespace HotelBookingFinal.Repositories
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+
+        }
+
+        public void TestRepository()
+        {
+            var repo = new AdminRepository();
+
+            // Test Create
+            var newAdmin = new Admin()
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                Username = "johndoe",
+                Email = "johndoe@example.com",
+                HotelId = 1
+            };
+            bool createSuccess = repo.CreateAdmin(newAdmin, "TempPassword123");
+            Console.WriteLine($"Create admin: {createSuccess}");
+
+            // Test Authentication
+            string token = repo.AuthenticateAdmin("johndoe", "SecurePassword123", out Admin authenticatedAdmin);
+            Console.WriteLine($"Auth result: {authenticatedAdmin != null}");
+            Console.WriteLine($"JWT Token: {token?.Substring(0, 20)}...");
 
         }
     }

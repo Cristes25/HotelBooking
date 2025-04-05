@@ -7,12 +7,11 @@ namespace HotelBookingFinal.Models
     {
         public int AdminId { get; set; }
         public int HotelId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Username { get; set; }
-        private string _passwordHash;
-        public string Email { get; set; }
-
+        public required string FirstName { get; set; }
+        public required string LastName { get; set; }
+        public required string Username { get; set; }
+        private string? _passwordHash;
+        public required string Email { get; set; }
 
         public void SetPassword(string password)
         {
@@ -22,10 +21,9 @@ namespace HotelBookingFinal.Models
         {
             return PasswordHasher.VerifyPassword(password, _passwordHash);
         }
-        public string GetPasswordHash()
+        public string? GetPasswordHash()
         {
             return _passwordHash;
         }
-
     }
 }

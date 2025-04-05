@@ -1,5 +1,9 @@
 {
-
-  "ConnectionString": "server=localhost;database=hotelbookingsytem;user=root;password=cr!st!ana25@;port=3306"
-
+  "Database": {
+    "Server": "localhost",
+    "Database": "hotelbookingsystem",
+    "User": "root",
+    "Password": "c!rist!ana25@",
+    "Port": "3306"
+  }
 }
