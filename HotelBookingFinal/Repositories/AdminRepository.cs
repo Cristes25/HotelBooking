@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Dapper;
 
 namespace HotelBookingFinal.Repositories
 {
@@ -47,6 +48,17 @@ namespace HotelBookingFinal.Repositories
             }
         }
         //R
+       
+        public Admin? GetAdminByUsername(string username)
+        {
+            using (var conn = new MySqlConnection(_connectionString))
+            {
+                return conn.QueryFirstOrDefault<Admin>(
+                    "SELECT * FROM Administrators WHERE Username = @Username",
+                    new { Username = username }
+                );
+            }
+        }
         public Admin GetAdminById(int adminId)
         {
             using (var conn = new MySqlConnection(_connectionString))
@@ -215,6 +227,7 @@ namespace HotelBookingFinal.Repositories
             return tokenHandler.WriteToken(token);
 
         }
+
 
         public void TestRepository()
         {

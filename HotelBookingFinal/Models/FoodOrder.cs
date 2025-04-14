@@ -10,7 +10,7 @@ namespace HotelBookingFinal.Models
     {
         public int OrderID { get; set; }
         public int BookingID { get; set; }
-        public Booking Booking { get; set; }
+        public Booking? Booking { get; set; }
         public FoodOrderType OrderType { get; set; }
     }
     public enum FoodOrderType { Unlimited, Limited }

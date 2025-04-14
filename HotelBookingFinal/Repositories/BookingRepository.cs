@@ -70,7 +70,7 @@ namespace HotelBookingFinal.Repositories
                         AND (
                             (@CheckIn < CheckOutDate) 
                             AND (@CheckOut > CheckInDate)
-                        )",
+                        ))",
                     new { RoomID = roomId, CheckIn = checkIn, CheckOut = checkOut });
             }
         }
@@ -97,6 +97,34 @@ namespace HotelBookingFinal.Repositories
                     booking.FoodOrders = conn.Query<FoodOrder>(
                         "SELECT * FROM FoodOrders WHERE BookingID = @Id",
                         new { Id = booking.BookingID }).ToList();
+                }
+
+                return booking;
+            }
+        }
+        // NEW METHOD: Get booking by integer ID
+        public Booking? GetBookingById(int bookingId)
+        {
+            using (var conn = new MySqlConnection(_connectionString))
+            {
+                var booking = conn.QueryFirstOrDefault<Booking>(
+                    "SELECT * FROM Bookings WHERE BookingID = @Id",
+                    new { Id = bookingId });
+
+                if (booking != null)
+                {
+                    // Load related data (consistent with GetBookingByCode)
+                    booking.Customer = conn.QueryFirstOrDefault<Customer>(
+                        "SELECT * FROM Customers WHERE CustomerID = @CustomerId",
+                        new { CustomerId = booking.CustomerID });
+
+                    booking.Room = conn.QueryFirstOrDefault<Room>(
+                        "SELECT * FROM Rooms WHERE RoomID = @RoomId",
+                        new { RoomId = booking.RoomID });
+
+                    booking.FoodOrders = conn.Query<FoodOrder>(
+                        "SELECT * FROM FoodOrders WHERE BookingID = @BookingId",
+                        new { BookingId = booking.BookingID }).ToList();
                 }
 
                 return booking;

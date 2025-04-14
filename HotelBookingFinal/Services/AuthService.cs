@@ -1,12 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using HotelBookingFinal.Models;
+using HotelBookingFinal.Repositories;
+using HotelBookingFinal.Utils;
 
 namespace HotelBookingFinal.Services
 {
-    internal class AuthService
+    public class AuthService
     {
+        private readonly AdminRepository _adminRepo = new AdminRepository();
+
+        public Admin? Login(string username, string password)
+        {
+            var admin = _adminRepo.GetAdminByUsername(username);
+
+            if (admin == null || !admin.VerifyPassword(password))
+                return null;
+
+            return admin;
+        }
+
+        public bool ChangePassword(int adminId, string newPassword)
+        {
+            return _adminRepo.UpdatePassword(
+                adminId,
+                PasswordHasher.HashPassword(newPassword)
+            );
+        }
     }
 }
