@@ -1,0 +1,18 @@
+{
+  "Database": {
+    "Server": "localhost",
+    "Database": "hotelbookingsystem",
+    "User": "root",
+    "Password": "c!rist!ana25@",
+    "Port": "3306"
+  },
+  "Emai": {
+    "SmtpServer": "smtp.gmail.com",
+    "Port": 587,
+    "FromEmail": "noreply@hotelhub.com",
+    "Username": "hotelhub@gmail.com",
+    "Password": "Hptel-Hub-password",
+    "EnableSsl": true,
+    "Timeout": "10000"
+  }
+}
