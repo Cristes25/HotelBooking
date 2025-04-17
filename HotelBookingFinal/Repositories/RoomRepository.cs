@@ -15,6 +15,31 @@ namespace HotelBookingFinal.Repositories
         {
             _connectionString = ConfigManager.GetConnectionString();
         }
+        public List<Room> GetAvailableRooms(int hotelId, DateTime from, DateTime to)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            return conn.Query<Room>(
+                @"SELECT r.* FROM Rooms r
+                JOIN Floors f ON r.FloorID = f.FloorID
+                WHERE f.HotelID = @HotelId
+                AND r.RoomID NOT IN (
+                    SELECT RoomID FROM Bookings
+                    WHERE CheckInDate < @To
+                    AND CheckOutDate > @From
+                    AND IsCancelled = FALSE
+                )",
+                new { HotelId = hotelId, From = from, To = to }
+            ).ToList();
+        }
+        public bool UpdateRoomAvailability(int roomId, bool isAvailable)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            return conn.Execute(
+                @"UPDATE Rooms SET IsAvailable = @IsAvailable
+                WHERE RoomID = @RoomID",
+                new { RoomID = roomId, IsAvailable = isAvailable }
+            ) > 0;
+        }
 
         public List<Room> GetRoomsByFloor(int floorId)
         {
@@ -73,24 +98,34 @@ namespace HotelBookingFinal.Repositories
         }
         public Room GetRoomById(int roomId)
         {
-            using (var conn = new MySqlConnection(_connectionString))
-            {
-                var room = conn.QueryFirstOrDefault<Room>(
-                    @"SELECT * FROM Rooms WHERE RoomID = @RoomID",
-                    new { RoomID = roomId }
-                );
+            using var conn = new MySqlConnection(_connectionString);
 
-                if (room != null)
+            var roomDict = new Dictionary<int, Room>();
+
+            var result = conn.Query<Room, Floor, Hotel, Room>(
+                @"SELECT r.*, f.*, h.* 
+                 FROM Rooms r
+                 JOIN Floors f ON r.FloorID = f.FloorID AND r.HotelID = f.HotelID
+                 JOIN Hotels h ON f.HotelID = h.HotelID
+                 WHERE r.RoomID = @RoomId",
+                (room, floor, hotel) =>
                 {
-                    // Load related floor data if needed
-                    room.Floor = conn.QueryFirstOrDefault<Floor>(
-                        "SELECT * FROM Floors WHERE FloorID = @FloorID",
-                        new { FloorID = room.FloorID }
-                    );
-                }
+                    if (!roomDict.TryGetValue(room.RoomID, out var roomEntry))
+                    {
+                        roomEntry = room;
+                        roomDict.Add(room.RoomID, roomEntry);
+                    }
 
-                return room;
-            }
+                    roomEntry.Floor = floor;
+                    roomEntry.Floor.Hotel = hotel;
+                    return roomEntry;
+                },
+                new { RoomId = roomId },
+                splitOn: "FloorID,HotelID"
+            ).FirstOrDefault();
+
+            return result;
         }
+
     }
 }
