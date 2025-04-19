@@ -1,20 +1,20 @@
 ﻿using HotelBookingFinal.Models;
 using HotelBookingFinal.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using HotelBookingFinal.Interfaces.Irepos;
+using HotelBookingFinal.Interfaces.Iservice;
+
 
 namespace HotelBookingFinal.Services
 {
-    public class BookingService
+    public class BookingService : IBookingService
     {
-        private readonly BookingRepository _bookingRepo;
-        private readonly RoomRepository _roomRepo;
-        private readonly EmailService _emailService;
-        private readonly AssetService _assetService;
-        private readonly FoodOrderRepository _foodOrderRepo;
-        private readonly PricingService _pricingService;
-        private readonly CustomerRepository _customerRepo;
+        private readonly IBookingRepository _bookingRepo;
+        private readonly IRoomRepository _roomRepo;
+        private readonly IEmailService _emailService;
+        private readonly IAssetService _assetService;
+        private readonly IFoodOrderRepository _foodOrderRepo;
+        private readonly IPricingService _pricingService;
+        private readonly ICustomerRepository _customerRepo;
 
         public BookingService()
         {
@@ -139,7 +139,7 @@ namespace HotelBookingFinal.Services
             return _bookingRepo.GetCustomerBookings(customerId);
         }
 
-        private string GenerateBookingCode()
+        private static string GenerateBookingCode()
         {
             return Guid.NewGuid().ToString("N")[..8].ToUpper();
         }
@@ -162,8 +162,10 @@ namespace HotelBookingFinal.Services
     public class BookingRequest
     {
         public int RoomId { get; set; }
+        public int RoomID { get; internal set; }
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
         public List<FoodOrder>? FoodOrders { get; set; }
+        public string SpecialRequests { get; internal set; }
     }
 }

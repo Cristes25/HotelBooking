@@ -1,14 +1,16 @@
 ﻿using HotelBookingFinal.Models;
 using HotelBookingFinal.Repositories;
-using System;
-using System.Collections.Generic;
+using HotelBookingFinal.Interfaces.Irepos;
+using HotelBookingFinal.Interfaces.Iservice;
+
+
 
 namespace HotelBookingFinal.Services
 {
-    public class AssetService
+    public class AssetService: IAssetService
     {
-        private readonly AssetRepository _assetRepo = new AssetRepository();
-        private readonly RoomRepository _roomRepo = new RoomRepository();
+        private readonly IAssetRepository _assetRepo = new AssetRepository();
+        private readonly IRoomRepository _roomRepo = new RoomRepository();
 
         // Get all assets in a room with validation
         public List<Asset> GetRoomAssets(int roomId)

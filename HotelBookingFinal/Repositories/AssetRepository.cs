@@ -2,12 +2,10 @@
 using HotelBookingFinal.Models;
 using HotelBookingFinal.Utils;
 using MySql.Data.MySqlClient;
-using System.Collections.Generic;
-using System.Linq;
-
+using HotelBookingFinal.Interfaces.Irepos;
 namespace HotelBookingFinal.Repositories
 {
-    public class AssetRepository
+    public class AssetRepository: IAssetRepository
     {
         private readonly string _connectionString;
 

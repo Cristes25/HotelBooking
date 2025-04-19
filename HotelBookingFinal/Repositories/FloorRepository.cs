@@ -3,10 +3,11 @@ using HotelBookingFinal.Utils;
 using System;
 using Dapper;
 using MySql.Data.MySqlClient;
+using HotelBookingFinal.Interfaces.Irepos;
 
 namespace HotelBookingFinal.Repositories
 {
-    public class FloorRepository
+    public class FloorRepository : IFloorRepository
     {
         private readonly string _connectionString;
 
@@ -113,5 +114,8 @@ namespace HotelBookingFinal.Repositories
                     new { Id = floorId });
             }
         }
-    }
 }
+}
+    
+
+

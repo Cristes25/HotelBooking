@@ -1,10 +1,12 @@
 ﻿using HotelBookingFinal.Utils;
 using System.Net;
 using System.Net.Mail;
+using HotelBookingFinal.Interfaces.Irepos;
+using HotelBookingFinal.Interfaces.Iservice;
 
 namespace HotelBookingFinal.Services
 {
-    public class EmailService
+    public class EmailService: IEmailService
     {
         private readonly SmtpClient _client;
         private readonly string _fromEmail;

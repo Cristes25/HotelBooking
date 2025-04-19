@@ -1,14 +1,16 @@
-﻿// Services/CustomerAuthService.cs
+﻿
 using HotelBookingFinal.Models;
 using HotelBookingFinal.Repositories;
+using HotelBookingFinal.Interfaces.Irepos;
+using HotelBookingFinal.Interfaces.Iservice;
 
 namespace HotelBookingFinal.Services
 {
-    public class CustomerAuthService
+    public class CustomerAuthService: ICustumerAuthService
     {
-        private readonly CustomerRepository _customerRepo;
+        private readonly ICustomerRepository _customerRepo;
 
-        public CustomerAuthService(CustomerRepository customerRepo)
+        public CustomerAuthService (ICustomerRepository customerRepo)
         {
             _customerRepo = customerRepo;
         }
@@ -16,7 +18,7 @@ namespace HotelBookingFinal.Services
         public Customer? Login(string email, string password)
         {
             var customer = _customerRepo.GetCustomerByEmail(email);
-            return (bool)(customer?.VerifyPassword(password)) ? customer : null;
+            return (bool)(customer.VerifyPassword(password)) == true ? customer : null;
         }
 
         public (bool Success, string Message) Register(Customer customer, string password)
