@@ -2,10 +2,10 @@
 using HotelBookingFinal.Utils;
 using MySql.Data.MySqlClient;
 using Dapper;
-
+using HotelBookingFinal.Interfaces.Irepos;
 namespace HotelBookingFinal.Repositories
 {
-    public class RoomRepository
+    public class RoomRepository: IRoomRepository
     {
 
 
@@ -14,6 +14,42 @@ namespace HotelBookingFinal.Repositories
         public RoomRepository()
         {
             _connectionString = ConfigManager.GetConnectionString();
+        }
+        public List<Room> GetRoomsUnderMaintenance(int hotelId)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            return conn.Query<Room>(
+                @"SELECT r.* FROM Rooms r
+                JOIN Floors f ON r.FloorID = f.FloorID
+                WHERE f.HotelID = @HotelId
+                AND r.IsUnderMaintenance = TRUE
+                AND (r.MaintenanceEndDate IS NULL OR r.MaintenanceEndDate > NOW())",
+                new { HotelId = hotelId }
+            ).ToList();
+        }
+
+        public bool SetRoomMaintenanceStatus(int roomId, bool isUnderMaintenance,
+                                          DateTime? startDate = null,
+                                          DateTime? endDate = null,
+                                          string notes = null)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            return conn.Execute(
+                @"UPDATE Rooms 
+                SET IsUnderMaintenance = @IsUnderMaintenance,
+                    MaintenanceStartDate = @StartDate,
+                    MaintenanceEndDate = @EndDate,
+                    MaintenanceNotes = @Notes
+                WHERE RoomID = @RoomID",
+                new
+                {
+                    RoomID = roomId,
+                    IsUnderMaintenance = isUnderMaintenance,
+                    StartDate = startDate,
+                    EndDate = endDate,
+                    Notes = notes
+                }
+            ) > 0;
         }
         public List<Room> GetAvailableRooms(int hotelId, DateTime from, DateTime to)
         {
@@ -126,6 +162,12 @@ namespace HotelBookingFinal.Repositories
 
             return result;
         }
-
+      
+       
+        }
+   
     }
-}
+
+    
+
+

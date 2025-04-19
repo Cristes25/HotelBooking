@@ -1,11 +1,12 @@
 ﻿using Dapper;
+using HotelBookingFinal.Interfaces.Irepos;
 using HotelBookingFinal.Models;
 using HotelBookingFinal.Utils;
 using MySql.Data.MySqlClient;
 
 namespace HotelBookingFinal.Repositories
 {
-    public class CustomerRepository
+    public class CustomerRepository: ICustomerRepository
     {
         private readonly string _connectionString;
 
@@ -62,7 +63,24 @@ namespace HotelBookingFinal.Repositories
                 customer
             ) > 0;
         }
-
+        public bool UpdatePassword(int customerId, string newPasswordHash)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            try
+            {
+                int rowsAffected = conn.Execute(
+                    "UPDATE Customers SET PasswordHash = @PasswordHash WHERE CustomerID = @CustomerID",
+                    new { PasswordHash = newPasswordHash, CustomerID = customerId }
+                );
+                return rowsAffected > 0;
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                Console.WriteLine($"Error updating password: {ex.Message}");
+                return false;
+            }
+        }
         public bool DeleteCustomer(int customerId)
         {
             using var conn = new MySqlConnection(_connectionString);

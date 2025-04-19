@@ -2,11 +2,10 @@
 using HotelBookingFinal.Models;
 using HotelBookingFinal.Utils;
 using MySql.Data.MySqlClient;
-using System;
-
+using HotelBookingFinal.Interfaces.Irepos;
 namespace HotelBookingFinal.Repositories
 {
-    public class PricingRepository
+    public class PricingRepository: IPricingRepository
     {
         private readonly string _connectionString;
 

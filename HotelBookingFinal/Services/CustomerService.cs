@@ -1,13 +1,14 @@
 ﻿using HotelBookingFinal.Models;
 using HotelBookingFinal.Repositories;
-using System;
+using HotelBookingFinal.Interfaces.Irepos;
+using HotelBookingFinal.Interfaces.Iservice;
 
 namespace HotelBookingFinal.Services
 {
-    public class CustomerService
+    public class CustomerService : ICustomerService
     {
-        private readonly CustomerRepository _customerRepo;
-        private readonly BookingRepository _bookingRepo;
+        private readonly ICustomerRepository _customerRepo;
+        private readonly IBookingRepository _bookingRepo;
 
         public CustomerService()
         {

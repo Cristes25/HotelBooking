@@ -1,13 +1,14 @@
 ﻿using HotelBookingFinal.Models;
 using HotelBookingFinal.Repositories;
-using System;
+using HotelBookingFinal.Interfaces.Irepos;
+using HotelBookingFinal.Interfaces.Iservice;
 
 namespace HotelBookingFinal.Services
 {
-    public class PricingService
+    public class PricingService: IPricingService
     {
-        private readonly PricingRepository _pricingRepo = new PricingRepository();
-        private readonly AssetRepository _assetRepo = new AssetRepository();
+        private readonly IPricingRepository _pricingRepo = new PricingRepository();
+        private readonly IAssetRepository _assetRepo = new AssetRepository();
 
         public decimal CalculateBookingCost(int roomId, DateTime checkIn, DateTime checkOut, bool hasFoodOrder)
         {

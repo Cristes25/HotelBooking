@@ -1,13 +1,14 @@
-﻿
+﻿using HotelBookingFinal.Interfaces.Irepos;
+using HotelBookingFinal.Interfaces.Iservice;
 using HotelBookingFinal.Models;
 using HotelBookingFinal.Repositories;
 using HotelBookingFinal.Utils;
 
 namespace HotelBookingFinal.Services
 {
-    public class AuthService
+    public class AuthService: IAdminAuthService
     {
-        private readonly AdminRepository _adminRepo = new AdminRepository();
+        private readonly IAdminRepository _adminRepo = new AdminRepository();
 
         public Admin? Login(string username, string password)
         {
@@ -26,5 +27,7 @@ namespace HotelBookingFinal.Services
                 PasswordHasher.HashPassword(newPassword)
             );
         }
+
+        
     }
 }

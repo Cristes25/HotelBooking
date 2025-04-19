@@ -1,13 +1,13 @@
 ﻿using HotelBookingFinal.Models;
 using HotelBookingFinal.Repositories;
-
-
+using HotelBookingFinal.Interfaces.Iservice;
+using HotelBookingFinal.Interfaces.Irepos;
 namespace HotelBookingFinal.Services
 {
-    public class HotelServices
+    public class HotelServices : IHotelService
     {
-        private readonly HotelRepository _hotelRepository;
-        private readonly FloorRepository _floorRepository;
+        private readonly IHotelRepository _hotelRepository;
+        private readonly IFloorRepository _floorRepository;
 
         public HotelServices()
         {

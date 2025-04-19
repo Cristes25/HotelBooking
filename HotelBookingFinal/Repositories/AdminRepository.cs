@@ -6,10 +6,11 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Dapper;
+using HotelBookingFinal.Interfaces.Irepos;
 
 namespace HotelBookingFinal.Repositories
 {
-    public class AdminRepository
+    public class AdminRepository: IAdminRepository
     {
         private readonly string _connectionString;
 
